@@ -83,9 +83,9 @@
             // cbbselect
             // 
             this.cbbselect.FormattingEnabled = true;
-            this.cbbselect.Location = new System.Drawing.Point(277, 91);
+            this.cbbselect.Location = new System.Drawing.Point(249, 91);
             this.cbbselect.Name = "cbbselect";
-            this.cbbselect.Size = new System.Drawing.Size(75, 28);
+            this.cbbselect.Size = new System.Drawing.Size(103, 28);
             this.cbbselect.TabIndex = 11;
             // 
             // btnLoadFromDisk
@@ -157,7 +157,7 @@
             this.cbbFrom.FormattingEnabled = true;
             this.cbbFrom.Location = new System.Drawing.Point(681, 76);
             this.cbbFrom.Name = "cbbFrom";
-            this.cbbFrom.Size = new System.Drawing.Size(137, 28);
+            this.cbbFrom.Size = new System.Drawing.Size(169, 28);
             this.cbbFrom.TabIndex = 4;
             this.cbbFrom.SelectedIndexChanged += new System.EventHandler(this.cbbFrom_SelectedIndexChanged);
             // 

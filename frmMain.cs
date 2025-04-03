@@ -832,7 +832,6 @@ ORDER BY  MaSo DESC";
                         if (!people.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
                         {
                             people.Add(new FileImport(excelFiles[j], SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo, TkThue, mst, Thanhtien, Vat, 2, ""));
-
                         }
 
                     }
@@ -1515,9 +1514,29 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 .Perform();
                 var button = wait.Until(d => d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn') and .//span[text()='Tìm kiếm']])[2]")));
                 button.Click();
-                //Click download XML  
-                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
 
+                //Chọn 50 rows
+                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+                var divElement = wait.Until(d => d.FindElements(By.XPath("//div[@class='ant-select-selection-selected-value' and @title='15']")));
+
+                // Kiểm tra nếu phần tử được tìm thấy và nhấp vào nó
+                if (divElement != null && divElement[1].Displayed)
+                {
+                    divElement[1].Click();
+                    Console.WriteLine("Đã nhấp vào phần tử.");
+                }
+                var dropdownMenu = wait.Until(d => d.FindElement(By.ClassName("ant-select-dropdown-menu")));
+
+                // Tìm phần tử <li> có nội dung là "50" và nhấp vào nó
+                var option50 = wait.Until(d => dropdownMenu.FindElements(By.XPath(".//li[text()='50']")));
+
+                // Nhấp vào phần tử "50"
+                if (option50 != null )
+                {
+                    option50[0].Click(); 
+                }
+                //Click download XML   
+                Thread.Sleep(1000);
                 // Cách 1: Target vào thẻ <i> có aria-label
                 //   d.FindElement(By.CssSelector("button.ant-btn-icon-only i[aria-label='icon: user']")
 
@@ -1531,18 +1550,19 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 Console.WriteLine($"Số dòng trong bảng: {rowCount}");
 
-                button = wait.Until(d =>
-                    d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[18]")));
+                //Click download Excel
+                //button = wait.Until(d =>
+                //    d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[18]")));
 
 
-                ((IJavaScriptExecutor)Driver).ExecuteScript("arguments[0].scrollIntoView({behavior: 'smooth'});", button);
+                //((IJavaScriptExecutor)Driver).ExecuteScript("arguments[0].scrollIntoView({behavior: 'smooth'});", button);
 
-                // Hover rồi mới click
-                new Actions(Driver)
-                    .MoveToElement(button)
-                    .Pause(TimeSpan.FromSeconds(1))
-                    .Click()
-                    .Perform();
+                //// Hover rồi mới click
+                //new Actions(Driver)
+                //    .MoveToElement(button)
+                //    .Pause(TimeSpan.FromSeconds(1))
+                //    .Click()
+                //    .Perform();
 
                 int currentRow = 1;
                 bool hasMoreRows = true;
@@ -1683,6 +1703,9 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 Xulymaytinhtien(wait);
                 DoTask += 1;
+                //Trước khi kết thúc, rà lại theo file excel
+                int ralai = 10;
+
                 Xulysaudangnhap();
             }
             catch (Exception ex)
