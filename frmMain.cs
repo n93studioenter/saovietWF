@@ -381,8 +381,8 @@ namespace SaovietWF
                 XmlNode ndhDonNode = root.SelectSingleNode("//NDHDon");
                 XmlNode nTTChungNode = root.SelectSingleNode("//TTChung");
                 XmlNode nTTThanToan = root.SelectSingleNode("//LTSuat");
-                XmlNode nThTien = root.SelectSingleNode("//LTSuat//ThTien");
-                XmlNode nTSuat = root.SelectSingleNode("//LTSuat//TSuat");
+                var nThTien = root.SelectNodes("//LTSuat//ThTien");
+                var nTSuat = root.SelectNodes("//LTSuat//TSuat");
                 string SHDon = "";
                 string KHHDon = "";
                 string ten = "";
@@ -454,10 +454,15 @@ namespace SaovietWF
 
                 if (nTSuat != null)
                 {
-                    if (nTSuat.InnerText != "KKKNT")
-                        Vat = int.Parse(nTSuat.InnerText.Replace("%", ""));
-                    else
-                        Vat = 0;
+                    for(int i=0;i< nTSuat.Count; i++)
+                    {
+                        XmlNode item = nTSuat[i];
+                        if (item.InnerText != "KKKNT" && item.InnerText != "KCT")
+                            Vat = int.Parse(item.InnerText.Replace("%", ""));
+                        else
+                            Vat = 0;
+                    } 
+                   
                 }
                 else
                 {
@@ -465,7 +470,13 @@ namespace SaovietWF
                 }
                 if (nThTien != null)
                 {
-                    Thanhtien = double.Parse(nThTien.InnerText);
+                    for(int i = 0; i < nThTien.Count; i++)
+                    {
+                        if (nThTien[i].InnerText != "0")
+                            Thanhtien = double.Parse(nThTien[i].InnerText);
+                        else
+                            Thanhtien = 0;
+                    } 
                 }
                 else
                 {
@@ -484,6 +495,11 @@ WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
                     var Sohieu = GetLastFourDigits(mst);
                     ten = Helper.ConvertUnicodeToVni(ten);
                     diachi = Helper.ConvertUnicodeToVni(diachi);
+                    query = @" SELECT TOP 1 *  FROM KhachHang As kh
+WHERE kh.SoHieu = ?";
+                    DataTable result2 = ExecuteQuery(query, new OleDbParameter("?", Sohieu));
+                    if (result2.Rows.Count > 0)
+                        Sohieu = "0" + Sohieu;
                     InitCustomer(2, Sohieu, ten, diachi, mst);
                 }
 
@@ -548,14 +564,14 @@ ORDER BY  MaSo DESC";
                     }
                     else
                     {
-                        TkNo = 152;
+                        TkNo = 0;
                         TkCo = 1111;
                         TkThue = 1331;
                     }
                 }
                 else
                 {
-                    TkNo = 152;
+                    TkNo = 0;
                     TkCo = 1111;
                     TkThue = 1331;
                 }
@@ -767,6 +783,12 @@ WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
                             var Sohieu = GetLastFourDigits(mst);
                             ten = Helper.ConvertUnicodeToVni(ten);
                             diachi = Helper.ConvertUnicodeToVni(diachi);
+                            //Kiểm tra sohieu có trùng nữa ko
+                            query = @" SELECT TOP 1 *  FROM KhachHang As kh
+WHERE kh.SoHieu = ?";
+                            DataTable result2 = ExecuteQuery(query, new OleDbParameter("?", Sohieu));
+                            if (result2.Rows.Count > 0)
+                                Sohieu = "0" + Sohieu;
                             InitCustomer(2, Sohieu, ten, diachi, mst);
                         }
 
@@ -893,12 +915,12 @@ ORDER BY  MaSo DESC";
 
 
 
-            dataGridView1.Columns["Type"].Visible = true;
-            dataGridView1.Columns["Type"].HeaderText = "Loại";
-            dataGridView1.Columns["Type"].Width = 70;
-            dataGridView1.Columns["Type"].DisplayIndex = 0;
-            dataGridView1.Columns["Type"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridView1.Columns["Type"].ReadOnly = true;
+            dataGridView1.Columns["ID"].Visible = true;
+            dataGridView1.Columns["ID"].HeaderText = "STT";
+            dataGridView1.Columns["ID"].Width = 70;
+            dataGridView1.Columns["ID"].DisplayIndex = 0;
+            dataGridView1.Columns["ID"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridView1.Columns["ID"].ReadOnly = true;
 
 
 
@@ -1168,7 +1190,7 @@ ORDER BY  MaSo DESC";
             //
             if (dataGridView1.Columns[e.ColumnIndex].Name == "TKNo")
             {
-                e.CellStyle.ForeColor = System.Drawing.Color.Red; // Tô màu đỏ cho chữ
+                e.CellStyle.ForeColor = System.Drawing.Color.DarkSlateBlue; // Tô màu đỏ cho chữ
                 e.CellStyle.Font = new System.Drawing.Font(e.CellStyle.Font, FontStyle.Bold);
             }
             if (dataGridView1.Columns[e.ColumnIndex].Name == "TKCo")
@@ -1268,6 +1290,158 @@ ORDER BY  MaSo DESC";
         public void Chonngaytheothang()
         {
 
+        }
+        private void Cucthuekhngnhanma(WebDriverWait wait)
+        {
+            var divElement = wait.Until(d => d.FindElements(By.Id("ttxly")));
+            // Nhấp vào phần tử đó
+            divElement[1].Click();
+            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+            var listItem = wait.Until(d => d.FindElements(By.XPath("//li[@role='option' and @class='ant-select-dropdown-menu-item']"))
+            .FirstOrDefault(e => e.Text.Trim() == "Cục Thuế đã nhận không mã"));
+
+            // Kiểm tra nếu phần tử được tìm thấy và nhấp vào nó
+            if (listItem != null)
+            {
+                listItem.Click(); 
+            }
+            else
+            {
+                Console.WriteLine("Không tìm thấy phần tử với văn bản cụ thể.");
+            }
+            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+            var tabElement = wait.Until(d => d.FindElements(By.XPath("//div[@role='tab']"))
+              .FirstOrDefault(e => e.Text.Trim() == "Hóa đơn điện tử"));
+            if (tabElement != null)
+            {
+                tabElement.Click();
+                Console.WriteLine("Đã nhấp vào tab.");
+            }
+            var button = wait.Until(d => d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn') and .//span[text()='Tìm kiếm']])[2]")));
+            button.Click();
+            //
+            Thread.Sleep(2000);
+            wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
+           
+            IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
+            int rowCount = rows.Count;
+
+            Console.WriteLine($"Số dòng trong bảng: {rowCount}");
+             
+
+            int currentRow = 1;
+            bool hasMoreRows = true;
+            List<string> lstHas = new List<string>();
+            int hasdata = 0;
+            while ((currentRow) <= rowCount)
+            {
+                try
+                {
+                    // Tìm dòng hiện tại
+                    var row = wait.Until(d =>
+                        d.FindElement(By.XPath($"(//tbody[@class='ant-table-tbody']/tr[contains(@class,'ant-table-row')])[{currentRow}]")));
+                    var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
+                    var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
+
+                    string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
+
+
+                    // Tạo mảng tham số với giá trị cho câu lệnh SQL
+                    OleDbParameter[] parameters = new OleDbParameter[]
+                    {
+            new OleDbParameter("KyHieu", cellC25TYY),          // Sử dụng chỉ số mà không cần tên
+            new OleDbParameter("SoHD", "%" + cell22252 + "%")  // Thêm ký tự % cho LIKE
+                    };
+                    var kq = ExecuteQuery(query, parameters);
+                    var a = people;
+                    var check = a.Any(m => m.KHHDon == cellC25TYY && m.SHDon.Contains(cell22252));
+                    if (check || kq.Rows.Count != 0)
+                    {
+                        //Xóa Excel
+                        var pp1 = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDDauVao";
+                        var pp21 = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDDauVao\\" + DoTask;
+                        // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
+                        string[] excelFiles1 = Directory.GetFiles(pp1, "*.xlsx");
+                        string fileName1 = Path.GetFileName(excelFiles1[0]); // Lấy tên file
+                        string destFilePath1 = Path.Combine(pp21, fileName1); // Tạo đường dẫn đích
+
+                        // Di chuyển file
+                        try
+                        {
+                            File.Move(excelFiles1[0], destFilePath1);
+                        }
+                        catch (Exception ex)
+                        {
+                            File.Delete(excelFiles1[0]);
+                        }
+                        currentRow++;
+                        hasdata++;
+                        continue;
+                    }
+
+                    // Click vào dòng
+                    row.Click();
+                    button = wait.Until(d =>
+                     d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[19]")));
+                    button.Click();
+                    // Xử lý sau khi click (đợi tải, đóng popup,...)
+                    Thread.Sleep(50); // Đợi 1 giây giữa các lần click
+                    string fp = "";
+                    if (currentRow == 15)
+                    {
+                        int aas = 10;
+                    }
+                    if (currentRow == 1)
+                        fp = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\\\HDDauVao\\" + "invoice.zip";
+                    else
+                        fp = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\\\HDDauVao\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
+
+                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+                    wait.Until(d => File.Exists(fp));
+                    lstHas.Add(fp);
+                    currentRow++; // Chuyển sang dòng tiếp theo
+                }
+                catch (NoSuchElementException)
+                {
+                    hasMoreRows = false; // Không còn dòng nào nữa
+
+
+                    Console.WriteLine($"Đã xử lý hết {currentRow - 1} dòng");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi khi xử lý dòng {currentRow}: {ex.Message}");
+                    currentRow++; // Vẫn tiếp tục với dòng tiếp theo
+                }
+            }
+            if (lstHas.Count == 0)
+                return;
+            var getlastlist = lstHas.LastOrDefault();
+            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+            wait.Until(d => File.Exists(getlastlist));
+
+            var pp = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDDauVao";
+            var pp2 = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDDauVao\\" + DoTask;
+            // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
+            string[] excelFiles = Directory.GetFiles(pp, "*.xlsx");
+            if (excelFiles.Length > 0)
+            {
+                string fileName = Path.GetFileName(excelFiles[0]); // Lấy tên file
+                string destFilePath = Path.Combine(pp2, fileName); // Tạo đường dẫn đích
+                try
+                {
+                    File.Move(excelFiles[0], destFilePath);
+                }
+                catch (Exception ex)
+                {
+                    File.Delete(excelFiles[0]);
+                }
+            }
+
+            // Di chuyển file
+
+
+            GiaiNenhoadon();
         }
         private void Xulymaytinhtien(WebDriverWait wait)
         {
@@ -1463,7 +1637,10 @@ ORDER BY  MaSo DESC";
         private void Xulysaudangnhap()
         {
             if (DoTask > Endtask)
+            {
+                Driver.Quit(); // Đóng WebDriver
                 return;
+            }
             Thread.Sleep(1000);
             if (Driver == null)
             {
@@ -1486,6 +1663,7 @@ ORDER BY  MaSo DESC";
                 ));
                 tab.Click();
 
+            
                 Thread.Sleep(1000);
                 wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
 
@@ -1592,23 +1770,6 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                         var check = a.Any(m => m.KHHDon == cellC25TYY && m.SHDon.Contains(cell22252));
                         if (check || kq.Rows.Count != 0)
                         {
-                            //Xóa Excel
-                            var pp1 = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDDauVao";
-                            var pp21 = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDDauVao\\" + DoTask;
-                            // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
-                            string[] excelFiles1 = Directory.GetFiles(pp1, "*.xlsx");
-                            string fileName1 = Path.GetFileName(excelFiles1[0]); // Lấy tên file
-                            string destFilePath1 = Path.Combine(pp21, fileName1); // Tạo đường dẫn đích
-
-                            // Di chuyển file
-                            try
-                            {
-                                File.Move(excelFiles1[0], destFilePath1);
-                            }
-                            catch (Exception ex)
-                            {
-                                File.Delete(excelFiles1[0]);
-                            }
                             currentRow++;
                             hasdata++;
                             continue;
@@ -1649,62 +1810,17 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                         currentRow++; // Vẫn tiếp tục với dòng tiếp theo
                     }
                 }
-                if (lstHas.Count == 0)
-                    return;
-                var getlastlist = lstHas.LastOrDefault();
-                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
-                wait.Until(d => File.Exists(getlastlist));
-                //Kiểm tra khi nào file tải đủ mới thực hiện
-                //if (currentRow == 2)
-                //{
-                //    string filePath = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\\\HDDauVao\\" + "invoice.zip";
-                //    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
-                //    wait.Until(d => File.Exists(filePath));
-                //}
-                //else
-                //{
-                //    string filePath = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\\\HDDauVao\\" + "invoice (" + (currentRow - 1) + ").zip";
-                //    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
-                //    wait.Until(d => File.Exists(filePath));
-                //}
-
-                // Kiểm tra file không còn bị lock (đang ghi)
-
-
-                //            button = wait.Until(d =>
-                //d.FindElement(By.CssSelector("button.ant-btn-icon-only:nth-child(18)")));
-                //Chuyen file excel vao folder
-                var pp = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDDauVao";
-                var pp2 = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDDauVao\\" + DoTask;
-                // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
-                string[] excelFiles = Directory.GetFiles(pp, "*.xlsx");
-                if (excelFiles.Length > 0)
+                if (lstHas.Count > 0)
                 {
-                    string fileName = Path.GetFileName(excelFiles[0]); // Lấy tên file
-                    string destFilePath = Path.Combine(pp2, fileName); // Tạo đường dẫn đích
-                    try
-                    {
-                        File.Move(excelFiles[0], destFilePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        File.Delete(excelFiles[0]);
-                    }
-                }
-
-                // Di chuyển file
-
-
-                GiaiNenhoadon();
-                //  LoadXmlFiles(savedPath);
-               // DoTask += 1;
-               // Xulysaudangnhap();
-                //Làm lan 2
-
+                    var getlastlist = lstHas.LastOrDefault();
+                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+                    wait.Until(d => File.Exists(getlastlist));
+                    
+                    GiaiNenhoadon();
+                } 
+                Cucthuekhngnhanma(wait);
                 Xulymaytinhtien(wait);
-                DoTask += 1;
-                //Trước khi kết thúc, rà lại theo file excel
-                int ralai = 10;
+                DoTask += 1;  
 
                 Xulysaudangnhap();
             }
@@ -1756,14 +1872,19 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 File.Delete(zipFilePath);
                 //Vào thư mục mới tạo
                 string invoiceFilePath = Path.Combine(extractPath, "invoice.xml");
-                var newname = Getnewname(invoiceFilePath);
+                string htmlFilepath = Path.Combine(extractPath, "invoice.html");
+                var newname = Getnewname(invoiceFilePath,1);
+                var newnamehtml = Getnewname(invoiceFilePath, 2);
                 var getsplit = (newname.Split('_'))[2];
+                var getsplithtml = (newnamehtml.Split('_'))[2];
                 newname = getsplit + "\\" + newname;
+                newnamehtml = getsplithtml + "\\" + newnamehtml;
                 string newFilePath = Path.Combine(path, newname);
-
+                string newFilePathhtml = Path.Combine(path, newnamehtml);
                 if (File.Exists(invoiceFilePath))
                 {
                     File.Move(invoiceFilePath, newFilePath);
+                    File.Move(htmlFilepath, newFilePathhtml);
                     Directory.Delete(extractPath, true); // true để xóa cả nội dung bên trong
                 }
                 else
@@ -1776,7 +1897,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 Console.WriteLine($"Lỗi khi giải nén: {ex.Message}");
             }
         }
-        private string Getnewname(string path)
+        private string Getnewname(string path,int type)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(path); // Tải file XML
@@ -1797,7 +1918,12 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 // Lấy tháng từ DateTime
                 month = date.Month;
             }
-            return "HD_" + "_" + month + "_" + SHDon + "_" + KHHDon + ".xml";
+            string filename = "";
+            if (type == 1)
+                filename = ".xml";
+            if (type == 2)
+                filename = ".html";
+            return "HD_" + "_" + month + "_" + SHDon + "_" + KHHDon + filename;
         }
 
         private void btnLoadFromDisk_Click(object sender, EventArgs e)
@@ -1872,6 +1998,39 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                     frmCongTrinh.BringToFront();
                     frmCongTrinh.Activate();
                 }
+                else
+                {
+                    if (e.ColumnIndex == 2)
+                    {
+                        WebBrowser  webBrowser1 = new WebBrowser
+                        {
+                            Dock = DockStyle.Fill // Đổ đầy không gian của form
+                        };
+                        cellValue = dataGridView1[2, e.RowIndex].Value.ToString();
+                        var hiddenValue = dataGridView1.Rows[e.RowIndex].Cells["Path"].Value;
+                        frmWebbrowser frmCongTrinh = new frmWebbrowser( );
+                        rowsl = e.RowIndex;
+                        frmCongTrinh.Text = hiddenValue.ToString().Replace(".xml",""); 
+                        // Thiết lập owner nếu cần
+                        frmCongTrinh.Owner = this; // Thiết lập form hiện tại là owner của form mới
+                         
+                        // Mở form mới dưới dạng modal
+                        frmCongTrinh.Show(); // Mở form
+
+                        // Đưa form mới lên trên cùng
+                        frmCongTrinh.BringToFront();
+                        frmCongTrinh.Activate();
+                        // Thêm điều khiển WebBrowser vào Form
+                        frmCongTrinh.Controls.Add(webBrowser1);
+
+                        
+                        string filePath = hiddenValue.ToString().Replace(".xml",".html");
+
+                        webBrowser1.Navigate("file:///" + filePath.Replace("\\", "/"));
+
+                    }
+                }
+                
             }
         }
 

@@ -100,3 +100,4 @@ C:\TCP\Saoviet\SaovietWF\SaovietWF\bin\Debug\Microsoft.Extensions.Primitives.xml
 C:\TCP\Saoviet\SaovietWF\SaovietWF\bin\Debug\Newtonsoft.Json.xml
 C:\TCP\Saoviet\SaovietWF\SaovietWF\bin\Debug\System.Diagnostics.DiagnosticSource.xml
 C:\TCP\Saoviet\SaovietWF\SaovietWF\obj\Debug\SaovietWF.FrmCongTrinh.resources
+C:\TCP\Saoviet\SaovietWF\SaovietWF\obj\Debug\SaovietWF.frmWebbrowser.resources
