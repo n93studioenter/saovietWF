@@ -26,6 +26,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf;
 using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml.Spreadsheet;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 namespace SaovietWF
 {
     public partial class frmMain : Form
@@ -136,7 +137,18 @@ namespace SaovietWF
                     connection.Open();
                     string tableName = "tbimport";
                     string tableNamedetail = "tbimportdetail";
+                    string tableDinhdanh = "tbDinhdanhtaikhoan";
                     // Kiểm tra xem bảng đã tồn tại hay không
+                    if (!TableExists(connection, tableDinhdanh))
+                    {
+                        // Tạo bảng nếu chưa tồn tại
+                        CreateTableDinhDanh(connection, tableDinhdanh);
+                        Console.WriteLine($"Bảng '{tableDinhdanh}' đã được tạo thành công.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Bảng '{tableName}' đã tồn tại.");
+                    }
                     if (!TableExists(connection, tableName))
                     {
                         // Tạo bảng nếu chưa tồn tại
@@ -186,7 +198,23 @@ namespace SaovietWF
             }
             return false;
         }
+        static void CreateTableDinhDanh(OleDbConnection connection, string tableName)
+        {
+            string createTableQuery = $@"
+        CREATE TABLE {tableName} (
+            ID AUTOINCREMENT PRIMARY KEY,
+            Type TEXT,
+            KeyValue TEXT,
+            TKNo TEXT,  
+            TKCo TEXT,
+            TKThue TEXT 
+        );";
 
+            using (OleDbCommand command = new OleDbCommand(createTableQuery, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
         static void CreateTable(OleDbConnection connection, string tableName)
         {
             string createTableQuery = $@"
@@ -938,7 +966,7 @@ ORDER BY  MaSo DESC";
 
             dataGridView1.Columns["Ten"].Visible = true;
             dataGridView1.Columns["Ten"].HeaderText = "Tên Cty";
-            dataGridView1.Columns["Ten"].Width = (int)(dataGridView1.Width * 0.2);
+            dataGridView1.Columns["Ten"].Width = (int)(dataGridView1.Width * 0.19);
             dataGridView1.Columns["Ten"].DisplayIndex = 3;
             dataGridView1.Columns["Ten"].ReadOnly = true;
 
@@ -1077,7 +1105,23 @@ ORDER BY  MaSo DESC";
                 //Di chuyển file
                 try
                 {
-                    File.Move(item.Path, item.Path.Replace("HDDauVao", "HDDauRa"));
+                    var htmlPath = savedPath + "\\HDDauVao";
+                    var month = "\\" + item.NLap.Month;
+                    htmlPath += month;
+                    var htmlFiles = Directory.EnumerateFiles(htmlPath, "*.html", SearchOption.AllDirectories);
+                    foreach(var it in htmlFiles)
+                    {
+                        File.Delete(it);
+                    }
+
+                    try
+                    {
+                        File.Move(item.Path, item.Path.Replace("HDDauVao", "HDDauRa"));
+                    }
+                    catch(Exception ex)
+                    {
+                        File.Delete(item.Path);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1085,22 +1129,25 @@ ORDER BY  MaSo DESC";
                 }
 
             }
+            //Tìm file html và xóa
+          
+
             //Di chuyển file excel
-            var newfapth = savedPath + "\\HDDauVao";
-            var excelFiles = Directory.EnumerateFiles(newfapth, "*.xlsx", SearchOption.AllDirectories);
-            foreach (var item in excelFiles)
-            {
-                try
-                {
-                    var replatepath = item.Replace("HDDauVao", "HDDauRa");
-                    File.Move(item, replatepath);
-                }
-                catch (Exception ex)
-                {
+            //var newfapth = savedPath + "\\HDDauVao";
+            //var excelFiles = Directory.EnumerateFiles(newfapth, "*.xlsx", SearchOption.AllDirectories);
+            //foreach (var item in excelFiles)
+            //{
+            //    try
+            //    {
+            //        var replatepath = item.Replace("HDDauVao", "HDDauRa");
+            //        File.Move(item, replatepath);
+            //    }
+            //    catch (Exception ex)
+            //    {
 
-                }
+            //    }
 
-            }
+            //}
             MessageBox.Show("Lấy dữ liệu thành công");
             isClick = true;
             this.Close();
@@ -2042,6 +2089,36 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        private void btnKHCapnhat_Click(object sender, EventArgs e)
+        {
+            if(string.IsNullOrEmpty(txtKHUsername.Text) || string.IsNullOrEmpty(txtKHPassword.Text))
+            {
+                MessageBox.Show("Vui lòng nhập thông tin");
+                return;
+            }
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["username"].Value = txtKHUsername.Text;
+            config.AppSettings.Settings["password"].Value = txtKHPassword.Text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+            MessageBox.Show("Cập nhật tài khoản thành công");
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selectedIndex = tabControl1.SelectedIndex;
+            if (selectedIndex == 1)
+            {
+                txtKHUsername.Text= ConfigurationManager.AppSettings["username"];
+                txtKHPassword.Text = ConfigurationManager.AppSettings["password"];
+            }
+            if (selectedIndex == 2)
+            {
+                cbbLoaidinhdanh.Items.Add("Hàng hóa");
+                cbbLoaidinhdanh.Items.Add("Hình thức thanh toán");
+            }
         }
 
         private static string RemoveVietnameseDiacritics(string text)
