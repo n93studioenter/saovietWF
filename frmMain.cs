@@ -27,6 +27,8 @@ using iText.Kernel.Pdf;
 using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml.Spreadsheet;
 using static Org.BouncyCastle.Math.EC.ECCurve;
+using static iText.IO.Image.Jpeg2000ImageData;
+using System.Collections;
 namespace SaovietWF
 {
     public partial class frmMain : Form
@@ -128,6 +130,7 @@ namespace SaovietWF
             dbPath = @"C:\S.T.E 25\S.T.E 25\DATA\KT2025.mdb"; // Thay đổi đường dẫn này
             password = "1@35^7*9)"; // Thay đổi mật khẩu này
             connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
+            //connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
             // connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database";
             //connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\S.T.E 25\S.T.E 25\DATA\importData.accdb;Persist Security Info=False";
             try
@@ -498,13 +501,22 @@ namespace SaovietWF
                 }
                 if (nThTien != null)
                 {
-                    for(int i = 0; i < nThTien.Count; i++)
+                    if (nThTien.Count > 0)
                     {
-                        if (nThTien[i].InnerText != "0")
-                            Thanhtien = double.Parse(nThTien[i].InnerText);
-                        else
-                            Thanhtien = 0;
-                    } 
+                        for (int i = 0; i < nThTien.Count; i++)
+                        {
+                            if (nThTien[i].InnerText != "0")
+                                Thanhtien = double.Parse(nThTien[i].InnerText);
+                            else
+                                Thanhtien = 0;
+                        }
+                    }
+                    else
+                    {
+                        XmlNode TgTTTBSo = root.SelectSingleNode("//TToan//TgTTTBSo");
+                        Thanhtien = double.Parse(TgTTTBSo.InnerText);
+                    }
+                   
                 }
                 else
                 {
@@ -592,16 +604,16 @@ ORDER BY  MaSo DESC";
                     }
                     else
                     {
-                        TkNo = 0;
-                        TkCo = 1111;
-                        TkThue = 1331;
+                        //TkNo = 0;
+                        //TkCo = 1111;
+                        //TkThue = 1331;
                     }
                 }
                 else
                 {
-                    TkNo = 0;
-                    TkCo = 1111;
-                    TkThue = 1331;
+                    //TkNo = 0;
+                    //TkCo = 1111;
+                    //TkThue = 1331;
                 }
                 if (TkThue == 0)
                 {
@@ -626,18 +638,21 @@ ORDER BY  MaSo DESC";
                         {
                             var THHDVu = hhdVuList[i].SelectSingleNode("THHDVu").InnerText;
                             var DVTinh = hhdVuList[i].SelectSingleNode("DVTinh").InnerText;
+                           
                             var SLuong = hhdVuList[i].SelectSingleNode("SLuong").InnerText;
-                            var DGia = hhdVuList[i].SelectSingleNode("DGia").InnerText;
-                            string newName = Helper.ConvertUnicodeToVni(THHDVu);
+                            var DGia = "";
+                            if (hhdVuList[i].SelectSingleNode("DGia") != null)
+                                DGia = hhdVuList[i].SelectSingleNode("DGia").InnerText;
+                            else
+                                DGia = "0";
+                                string newName = Helper.ConvertUnicodeToVni(THHDVu);
                             //Kiểm tra trong database xem có sản phẩm chưa, nếu chưa có thì thêm mới
                             query = @"Select * from Vattu 
 where TenVattu = ? ";
                             //int rs = (int)ExecuteQuery(query, new OleDbParameter("?", "SAdsd")).Rows[0][0];
                             var getdata = ExecuteQuery(query, new OleDbParameter("?", newName));
 
-                            string sohieu = "";
-                            var test = GenerateResultString(THHDVu.Trim());
-                            var bb = RemoveVietnameseDiacritics("Cá");
+                            string sohieu = ""; 
                             if (getdata.Rows.Count == 0)
                                 sohieu = GenerateResultString(THHDVu.Trim());
                             else
@@ -647,6 +662,11 @@ where TenVattu = ? ";
                             people.LastOrDefault().fileImportDetails.Add(fileImportDetail);
                             if (getdata.Rows.Count == 0)
                             {
+                                if (DVTinh == "kWh")
+                                {
+                                   
+                                    continue;
+                                }
                                 //Insert thêm vô database
                                 query = @"
         INSERT INTO Vattu (MaPhanLoai,SoHieu,TenVattu,DonVi)
@@ -699,10 +719,43 @@ where TenVattu = ? ";
                         people.LastOrDefault().TKNo = "6422";
                     }
                 }
+                //Kiểm tra lại lại mã với Định danh
+                foreach(var item in people)
+                {
+                    //Lấy danh sách định danh
+                    string querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
+
+                    result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
+                    if (item.TKNo =="0")
+                    {
+                        //Nếu có con
+                        if (item.fileImportDetails.Count > 0)
+                        {
+                            foreach(DataRow row in result.Rows)
+                            {
+                                string name = Helper.ConvertUnicodeToVni((string)row["KeyValue"]);
+
+                                if(item.fileImportDetails.Any(m=>m.Ten.Contains(name)))
+                                {
+                                    item.Noidung= row["Type"].ToString();
+                                    item.TKNo = row["TKNo"].ToString();
+                                    item.TKCo = int.Parse(row["TKCo"].ToString());
+                                    item.TkThue = int.Parse(row["TKThue"].ToString());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            item.TKCo = 1111;
+                            item.TkThue = 1331;
+                        }
+                    }
+                }
             }
             LoadExcel(savedPath);
             LoadDataGridview();
         }
+        
         public void LoadExcel(string filePath)
         {
             //       var excelFiles = Directory.EnumerateFiles(filePath, "*.xlsx", SearchOption.AllDirectories)
@@ -2106,6 +2159,73 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             MessageBox.Show("Cập nhật tài khoản thành công");
         }
 
+        private void LoadDataDinhDanh()
+        {
+            string querykh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
+
+            result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+            grvDinhdanh.DataSource = result;
+            foreach (DataGridViewColumn column in grvDinhdanh.Columns)
+            {
+                column.Visible = false;
+            }
+
+             
+            grvDinhdanh.Columns["ID"].Visible = true;
+            grvDinhdanh.Columns["ID"].HeaderText = "STT";
+            grvDinhdanh.Columns["ID"].Width = 70;
+            grvDinhdanh.Columns["ID"].DisplayIndex = 0;
+            grvDinhdanh.Columns["ID"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grvDinhdanh.Columns["ID"].ReadOnly = true;
+            //
+            grvDinhdanh.Columns["KeyValue"].Visible = true;
+            grvDinhdanh.Columns["KeyValue"].HeaderText = "Tên";
+            grvDinhdanh.Columns["KeyValue"].Width = 400;
+            grvDinhdanh.Columns["KeyValue"].DisplayIndex = 1;
+            grvDinhdanh.Columns["KeyValue"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grvDinhdanh.Columns["KeyValue"].ReadOnly = true;
+
+            grvDinhdanh.Columns["TKNo"].Visible = true;
+            grvDinhdanh.Columns["TKNo"].HeaderText = "TK Nợ";
+            grvDinhdanh.Columns["TKNo"].Width =120;
+            grvDinhdanh.Columns["TKNo"].DisplayIndex = 2;
+            grvDinhdanh.Columns["TKNo"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grvDinhdanh.Columns["TKNo"].ReadOnly = true;
+
+            grvDinhdanh.Columns["TKCo"].Visible = true;
+            grvDinhdanh.Columns["TKCo"].HeaderText = "TK Có";
+            grvDinhdanh.Columns["TKCo"].Width = 120;
+            grvDinhdanh.Columns["TKCo"].DisplayIndex = 3;
+            grvDinhdanh.Columns["TKCo"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grvDinhdanh.Columns["TKCo"].ReadOnly = true;
+
+            grvDinhdanh.Columns["TKThue"].Visible = true;
+            grvDinhdanh.Columns["TKThue"].HeaderText = "TK Thuế";
+            grvDinhdanh.Columns["TKThue"].Width =120;
+            grvDinhdanh.Columns["TKThue"].DisplayIndex = 4;
+            grvDinhdanh.Columns["TKThue"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grvDinhdanh.Columns["TKThue"].ReadOnly = true;
+
+            grvDinhdanh.Columns["Type"].Visible = true;
+            grvDinhdanh.Columns["Type"].HeaderText = "Diễn giải";
+            grvDinhdanh.Columns["Type"].Width = 300;
+            grvDinhdanh.Columns["Type"].DisplayIndex = 5;
+            grvDinhdanh.Columns["Type"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grvDinhdanh.Columns["Type"].ReadOnly = true;
+
+            DataGridViewButtonColumn deleteButtonColumn = new DataGridViewButtonColumn
+            {
+                HeaderText = "Delete",
+                Text = "Xóa",
+                UseColumnTextForButtonValue = true,
+                DisplayIndex =6
+
+            };
+            grvDinhdanh.Columns.Add(deleteButtonColumn);
+
+
+            grvDinhdanh.RowHeadersVisible = false;
+        }
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             int selectedIndex = tabControl1.SelectedIndex;
@@ -2116,9 +2236,62 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             }
             if (selectedIndex == 2)
             {
-                cbbLoaidinhdanh.Items.Add("Hàng hóa");
-                cbbLoaidinhdanh.Items.Add("Hình thức thanh toán");
+                LoadDataDinhDanh();
             }
+        }
+
+        private void btnThem_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtNoidung.Text) || string.IsNullOrEmpty(txtTKNo.Text) || string.IsNullOrEmpty(txtTkCo.Text) || string.IsNullOrEmpty(txtTKThue.Text))
+            {
+                MessageBox.Show("Vui lòng nhập thông tin!");
+                return;
+            }
+                string  query = @"
+        INSERT INTO tbDinhdanhtaikhoan (KeyValue,TKNo,TKCo,TKThue,Type)
+        VALUES (?,?,?,?,?)";
+            OleDbParameter[] parameters = new OleDbParameter[]
+{
+        new OleDbParameter("?",txtNoidung.Text), 
+           new OleDbParameter("?",txtTKNo.Text),
+                 new OleDbParameter("?",txtTkCo.Text),
+             new OleDbParameter("?",txtTKThue.Text),
+              new OleDbParameter("?",txtGhichu.Text)
+};
+
+            // Thực thi truy vấn và lấy kết quả
+            int a = ExecuteQueryResult(query, parameters);
+            LoadDataDinhDanh();
+        }
+
+        private void grvDinhdanh_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            string columnName = grvDinhdanh.Columns[e.ColumnIndex].Name;
+
+            if (columnName=="")
+            {
+                // Xác nhận xóa với người dùng
+                var confirmResult = MessageBox.Show("Bạn có chắc chắn muốn xóa hàng này?",
+                                     "Xác nhận xóa",
+                                     MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (confirmResult == DialogResult.Yes)
+                {
+                    var getid = grvDinhdanh.Rows[e.RowIndex].Cells[0].Value.ToString();
+                    // Xóa hàng
+                    string sql = "DELETE FROM tbDinhdanhtaikhoan WHERE ID = @AccountID";
+                    OleDbParameter[] parameters = new OleDbParameter[]
+                {
+        new OleDbParameter("?", getid),
+                };
+                    int resl = ExecuteQueryResult(sql, parameters);
+                    LoadDataDinhDanh();
+                }
+            }
+        }
+
+        private void cbbselect_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
 
         private static string RemoveVietnameseDiacritics(string text)

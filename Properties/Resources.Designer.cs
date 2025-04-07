@@ -59,5 +59,15 @@ namespace SaovietWF.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap pngtree_tax_file_document_icon_png_image_913552 {
+            get {
+                object obj = ResourceManager.GetObject("pngtree-tax-file-document-icon-png-image_913552", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
