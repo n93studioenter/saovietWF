@@ -142,7 +142,7 @@
             this.btnImport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnImport.Image = ((System.Drawing.Image)(resources.GetObject("btnImport.Image")));
             this.btnImport.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnImport.Location = new System.Drawing.Point(1073, 163);
+            this.btnImport.Location = new System.Drawing.Point(1075, 163);
             this.btnImport.Name = "btnImport";
             this.btnImport.Size = new System.Drawing.Size(198, 38);
             this.btnImport.TabIndex = 8;
@@ -158,7 +158,7 @@
             this.btnLoc.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLoc.Image = ((System.Drawing.Image)(resources.GetObject("btnLoc.Image")));
             this.btnLoc.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLoc.Location = new System.Drawing.Point(1073, 104);
+            this.btnLoc.Location = new System.Drawing.Point(1075, 104);
             this.btnLoc.Name = "btnLoc";
             this.btnLoc.Size = new System.Drawing.Size(198, 40);
             this.btnLoc.TabIndex = 7;
@@ -175,7 +175,7 @@
             this.cbbTo.FormattingEnabled = true;
             this.cbbTo.Location = new System.Drawing.Point(709, 112);
             this.cbbTo.Name = "cbbTo";
-            this.cbbTo.Size = new System.Drawing.Size(343, 28);
+            this.cbbTo.Size = new System.Drawing.Size(345, 28);
             this.cbbTo.TabIndex = 6;
             // 
             // label3
@@ -220,7 +220,7 @@
             this.btnCapnhat.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCapnhat.Image = ((System.Drawing.Image)(resources.GetObject("btnCapnhat.Image")));
             this.btnCapnhat.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCapnhat.Location = new System.Drawing.Point(1073, 44);
+            this.btnCapnhat.Location = new System.Drawing.Point(1075, 44);
             this.btnCapnhat.Name = "btnCapnhat";
             this.btnCapnhat.Size = new System.Drawing.Size(198, 34);
             this.btnCapnhat.TabIndex = 2;
@@ -234,7 +234,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPath.Location = new System.Drawing.Point(152, 49);
             this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(900, 26);
+            this.txtPath.Size = new System.Drawing.Size(902, 26);
             this.txtPath.TabIndex = 1;
             // 
             // dataGridView1
@@ -252,7 +252,7 @@
             this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("VK Sans Display DemiBold", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(1678, 383);
+            this.dataGridView1.Size = new System.Drawing.Size(1680, 385);
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
@@ -272,7 +272,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1718, 668);
+            this.tabControl1.Size = new System.Drawing.Size(1720, 670);
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -284,7 +284,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 29);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1710, 635);
+            this.tabPage1.Size = new System.Drawing.Size(1712, 637);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Import Data";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -305,7 +305,7 @@
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(20, 17);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1288, 212);
+            this.groupBox2.Size = new System.Drawing.Size(1290, 212);
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Lọc dữ liệu";
@@ -317,7 +317,7 @@
             this.groupBox1.Controls.Add(this.btnDownloadFromCQT);
             this.groupBox1.Controls.Add(this.btnLoadFromDisk);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(1324, 21);
+            this.groupBox1.Location = new System.Drawing.Point(1326, 21);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(374, 208);
             this.groupBox1.TabIndex = 4;
@@ -330,7 +330,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 29);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1712, 637);
+            this.tabPage2.Size = new System.Drawing.Size(1710, 635);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Thông tin tài khoản";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -404,7 +404,7 @@
             this.tabPage3.Controls.Add(this.grvDinhdanh);
             this.tabPage3.Location = new System.Drawing.Point(4, 29);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(1712, 637);
+            this.tabPage3.Size = new System.Drawing.Size(1710, 635);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Mật định tài khoản cho từ khóa thường gặp.";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -541,7 +541,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(1742, 692);
+            this.ClientSize = new System.Drawing.Size(1744, 694);
             this.Controls.Add(this.tabControl1);
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

@@ -691,8 +691,21 @@ where TenVattu = ? ";
                                 var ThTien = hhdVuList[i].SelectSingleNode("ThTien")?.InnerText;
                                 if (ThTien == null)
                                     ThTien = hhdVuList[i].SelectSingleNode("THTien")?.InnerText;
-                                FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, people.LastOrDefault().ID, "711", 0, double.Parse(ThTien), "Exception");
-                                people.LastOrDefault().fileImportDetails.Add(fileImportDetail);
+                                if (hhdVuList.Count == 1)
+                                {
+                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, people.LastOrDefault().ID, "711", 1, double.Parse(ThTien), "Exception");
+                                    people.LastOrDefault().TKNo = "711";
+                                    people.LastOrDefault().TKCo = 3311;
+                                    people.LastOrDefault().TkThue = 1331;
+                                    people.LastOrDefault().Noidung = "Cấn trừ";
+                                    people.LastOrDefault().fileImportDetails.Add(fileImportDetail);
+                                }
+                                else
+                                {
+                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, people.LastOrDefault().ID, "711", 0, double.Parse(ThTien), "Exception");
+                                    people.LastOrDefault().fileImportDetails.Add(fileImportDetail);
+                                }
+                              
                             }
                             else
                             {
