@@ -69,6 +69,7 @@
             this.txtNoidung = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.grvDinhdanh = new System.Windows.Forms.DataGridView();
+            this.panelPagination = new System.Windows.Forms.FlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -245,14 +246,14 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(20, 235);
+            this.dataGridView1.Location = new System.Drawing.Point(20, 290);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 62;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("VNI-Times", 7.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("VK Sans Display DemiBold", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(1680, 385);
+            this.dataGridView1.Size = new System.Drawing.Size(1680, 330);
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
@@ -260,6 +261,8 @@
             this.dataGridView1.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridView1_CellFormatting);
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             this.dataGridView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView1_KeyDown);
+            this.dataGridView1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.dataGridView1_KeyPress);
+            this.dataGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dataGridView1_KeyUp);
             // 
             // tabControl1
             // 
@@ -278,6 +281,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.panelPagination);
             this.tabPage1.Controls.Add(this.groupBox2);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Controls.Add(this.dataGridView1);
@@ -330,7 +334,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 29);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1710, 635);
+            this.tabPage2.Size = new System.Drawing.Size(1712, 637);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Thông tin tài khoản";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -404,7 +408,7 @@
             this.tabPage3.Controls.Add(this.grvDinhdanh);
             this.tabPage3.Location = new System.Drawing.Point(4, 29);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(1710, 635);
+            this.tabPage3.Size = new System.Drawing.Size(1712, 637);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Mật định tài khoản cho từ khóa thường gặp.";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -536,6 +540,13 @@
             this.grvDinhdanh.TabIndex = 0;
             this.grvDinhdanh.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.grvDinhdanh_CellContentClick);
             // 
+            // panelPagination
+            // 
+            this.panelPagination.Location = new System.Drawing.Point(20, 235);
+            this.panelPagination.Name = "panelPagination";
+            this.panelPagination.Size = new System.Drawing.Size(1680, 36);
+            this.panelPagination.TabIndex = 6;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -606,6 +617,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.FlowLayoutPanel panelPagination;
     }
 }
 
