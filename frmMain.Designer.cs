@@ -46,6 +46,7 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.panelPagination = new System.Windows.Forms.FlowLayoutPanel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -69,7 +70,9 @@
             this.txtNoidung = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.grvDinhdanh = new System.Windows.Forms.DataGridView();
-            this.panelPagination = new System.Windows.Forms.FlowLayoutPanel();
+            this.txtPathDB = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.btnLoadDbPath = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -278,6 +281,7 @@
             this.tabControl1.Size = new System.Drawing.Size(1720, 670);
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.tabControl1.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabControl1_Selected);
             // 
             // tabPage1
             // 
@@ -292,6 +296,13 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Import Data";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // panelPagination
+            // 
+            this.panelPagination.Location = new System.Drawing.Point(20, 235);
+            this.panelPagination.Name = "panelPagination";
+            this.panelPagination.Size = new System.Drawing.Size(1680, 36);
+            this.panelPagination.TabIndex = 6;
             // 
             // groupBox2
             // 
@@ -344,6 +355,9 @@
             this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.panel2.Controls.Add(this.btnLoadDbPath);
+            this.panel2.Controls.Add(this.label11);
+            this.panel2.Controls.Add(this.txtPathDB);
             this.panel2.Controls.Add(this.btnKHCapnhat);
             this.panel2.Controls.Add(this.label5);
             this.panel2.Controls.Add(this.txtKHPassword);
@@ -540,12 +554,36 @@
             this.grvDinhdanh.TabIndex = 0;
             this.grvDinhdanh.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.grvDinhdanh_CellContentClick);
             // 
-            // panelPagination
+            // txtPathDB
             // 
-            this.panelPagination.Location = new System.Drawing.Point(20, 235);
-            this.panelPagination.Name = "panelPagination";
-            this.panelPagination.Size = new System.Drawing.Size(1680, 36);
-            this.panelPagination.TabIndex = 6;
+            this.txtPathDB.Location = new System.Drawing.Point(107, 239);
+            this.txtPathDB.Name = "txtPathDB";
+            this.txtPathDB.Size = new System.Drawing.Size(309, 26);
+            this.txtPathDB.TabIndex = 5;
+            this.txtPathDB.TextChanged += new System.EventHandler(this.txtPathDB_TextChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.ForeColor = System.Drawing.Color.White;
+            this.label11.Location = new System.Drawing.Point(23, 241);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(66, 20);
+            this.label11.TabIndex = 6;
+            this.label11.Text = "Db path";
+            // 
+            // btnLoadDbPath
+            // 
+            this.btnLoadDbPath.BackColor = System.Drawing.Color.DimGray;
+            this.btnLoadDbPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLoadDbPath.ForeColor = System.Drawing.Color.White;
+            this.btnLoadDbPath.Location = new System.Drawing.Point(423, 233);
+            this.btnLoadDbPath.Name = "btnLoadDbPath";
+            this.btnLoadDbPath.Size = new System.Drawing.Size(78, 35);
+            this.btnLoadDbPath.TabIndex = 7;
+            this.btnLoadDbPath.Text = "Chọn";
+            this.btnLoadDbPath.UseVisualStyleBackColor = false;
+            this.btnLoadDbPath.Click += new System.EventHandler(this.btnLoadDbPath_Click);
             // 
             // frmMain
             // 
@@ -618,6 +656,9 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.FlowLayoutPanel panelPagination;
+        private System.Windows.Forms.Button btnLoadDbPath;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox txtPathDB;
     }
 }
 

@@ -29,6 +29,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using static Org.BouncyCastle.Math.EC.ECCurve;
 using static iText.IO.Image.Jpeg2000ImageData;
 using System.Collections;
+using Org.BouncyCastle.Utilities;
 namespace SaovietWF
 {
     public partial class frmMain : Form
@@ -127,8 +128,16 @@ namespace SaovietWF
         private void InitDB()
         {
             // Đường dẫn đến cơ sở dữ liệu Access và mật khẩu
-            dbPath = @"C:\S.T.E 25\S.T.E 25\DATA\KT2025.mdb"; // Thay đổi đường dẫn này
-            password = "1@35^7*9)"; // Thay đổi mật khẩu này
+            //dbPath = @"C:\S.T.E 25\S.T.E 25\DATA\KT2025.mdb"; // Thay đổi đường dẫn này
+            dbPath = ConfigurationManager.AppSettings["dbpath"];
+
+
+
+            string filePath = ConfigurationManager.AppSettings["dbpath"];
+            if (string.IsNullOrEmpty(filePath))
+                return;
+            // Đọc toàn bộ nội dung tệp
+            string password = "1@35^7*9)";
             connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
             //connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
             // connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database";
@@ -319,9 +328,9 @@ namespace SaovietWF
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
-            string querykh = @" SELECT *  FROM TP154 "; // Sử dụng ? thay cho @mst trong OleDb
+            //string querykh = @" SELECT *  FROM License "; // Sử dụng ? thay cho @mst trong OleDb
 
-            result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+            //result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
 
             //Kiểm tra có thiết lập đường dẫn chưa
             CheckPathExist();
@@ -1407,8 +1416,10 @@ ORDER BY  MaSo DESC";
                     var passwordField = Driver.FindElement(By.Id("password"));
                     //usernameField.SendKeys("3502501171"); // Thay your_username bằng tên đăng nhập thực tế
                     //passwordField.SendKeys("PDVT12345678aA@");
-                    usernameField.SendKeys("3501197169"); // Thay your_username bằng tên đăng nhập thực tế
-                    passwordField.SendKeys("QLGd1aA@");
+                    string username = ConfigurationManager.AppSettings["username"];
+                    string password = ConfigurationManager.AppSettings["password"];
+                    usernameField.SendKeys(username); // Thay your_username bằng tên đăng nhập thực tế
+                    passwordField.SendKeys(password);
                     new Actions(Driver)
      .KeyDown(Keys.Tab).KeyUp(Keys.Tab)  // Tab lần 1
      .Pause(TimeSpan.FromMilliseconds(100))  // Đợi ngắn
@@ -1429,7 +1440,8 @@ ORDER BY  MaSo DESC";
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Lỗi: {ex.Message}");
+                    Driver.Close();
+                   // MessageBox.Show($"Lỗi: {ex.Message}");
                 }
             }
         }
@@ -2332,6 +2344,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             int selectedIndex = tabControl1.SelectedIndex;
             if (selectedIndex == 1)
             {
+                txtPathDB.Text=  ConfigurationManager.AppSettings["dbpath"];
                 txtKHUsername.Text= ConfigurationManager.AppSettings["username"];
                 txtKHPassword.Text = ConfigurationManager.AppSettings["password"];
             }
@@ -2426,6 +2439,36 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 }
                
             }
+        }
+
+        private void btnLoadDbPath_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            // Cài đặt thuộc tính cho hộp thoại
+            openFileDialog.Filter = "Access Database Files (*.mdb)|*.mdb|All Files (*.*)|*.*";
+            openFileDialog.Title = "Chọn tệp MDB";
+
+            // Hiển thị hộp thoại và kiểm tra nếu người dùng chọn tệp
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                // Lưu đường dẫn tệp vào TextBox
+                txtPathDB.Text = openFileDialog.FileName;
+            }
+        }
+
+        private void txtPathDB_TextChanged(object sender, EventArgs e)
+        {
+
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["dbpath"].Value = txtPathDB.Text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void tabControl1_Selected(object sender, TabControlEventArgs e)
+        {
+
         }
 
         private static string RemoveVietnameseDiacritics(string text)
