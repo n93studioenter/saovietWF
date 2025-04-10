@@ -69,7 +69,7 @@ namespace SaovietWF
             public DateTime NLap { get; set; }
             public string Ten { get; set; }
             public string Noidung { get; set; }
-            public int TKCo { get; set; }
+            public string TKCo { get; set; }
             public string TKNo { get; set; }
             public int TkThue { get; set; }
             public string Mst { get; set; }
@@ -79,7 +79,7 @@ namespace SaovietWF
 
             public string SoHieuTP { get; set; }
             public List<FileImportDetail> fileImportDetails;
-            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, int tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP)
+            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP)
             {
                 ID = Id;
                 SHDon = shdon;
@@ -96,7 +96,7 @@ namespace SaovietWF
                 Id += 1;
                 fileImportDetails = new List<FileImportDetail>();
                 Type = type;
-                Checked = true;
+                Checked = noidung.Contains("âm")?false: true;
                 Path = path;
                 SoHieuTP = tenTP;
             }
@@ -613,7 +613,7 @@ ORDER BY  MaSo DESC";
                 //Kiểm tra Đã tồn tại số hóa đơn và số hiệu
                 if (!people.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
                 {
-                    people.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo, TkThue, mst, Thanhtien, Vat, 1, ""));
+                    people.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, ""));
                 }
                 for (int i = 0; i < hhdVuList.Count; i++)
                 {
@@ -653,16 +653,46 @@ where TenVattu = ? AND DonVi = ? ";
                                     continue;
                                 }
                                 //Insert thêm vô database
+                                //Trước khi insert vật tư , kiểm tra phân loại vật tư trước
+                                string km = Helper.ConvertUnicodeToVni("khuyến mãi").ToLower();
+                                string searchTerm = "%" + km + "%";
+
+                                string querydinhdanh = @" SELECT *  FROM PhanLoaiVattu where TenPhanLoai like ?"; // Sử dụng ? thay cho @mst trong OleDb
+                                result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTerm));
+                                //Nếu chưa có thì thêm mới
+                                if (result.Rows.Count == 0)
+                                {
+                                    query = @"
+        INSERT INTO PhanLoaiVattu (SoHieu,TenPhanLoai,Cap,MaTK)
+        VALUES (?,?,?,?)";
+                                    parameters = new OleDbParameter[]
+                    {
+        new OleDbParameter("?","HKM"),
+          new OleDbParameter("?","Haøng khuyeán maõi"),
+           new OleDbParameter("?",1),
+            new OleDbParameter("?",39)
+                    };
+                                   int rr= ExecuteQueryResult(query, parameters);
+                                }
+
                                 query = @"
         INSERT INTO Vattu (MaPhanLoai,SoHieu,TenVattu,DonVi)
         VALUES (?,?,?,?)";
-                                parameters = new OleDbParameter[]
-                    {
-        new OleDbParameter("?","1"),
+                                int maphanloai = 0;
+                                 querydinhdanh = @" SELECT *  FROM PhanLoaiVattu where TenPhanLoai like ?"; // Sử dụng ? thay cho @mst trong OleDb
+                                result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTerm));
+                                if (result.Rows.Count > 0)
+                                    maphanloai = int.Parse(result.Rows[0]["MaSo"].ToString());
+                                else
+                                    maphanloai = 1;
+                                    parameters = new OleDbParameter[]
+                        {
+
+        new OleDbParameter("?",maphanloai),
           new OleDbParameter("?",sohieu),
            new OleDbParameter("?",newName),
             new OleDbParameter("?",Helper.ConvertUnicodeToVni(DVTinh))
-                    };
+                        };
 
                                 // Thực thi truy vấn và lấy kết quả
                                 int a = ExecuteQueryResult(query, parameters);
@@ -680,7 +710,7 @@ where TenVattu = ? AND DonVi = ? ";
                                 {
                                     FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, people.LastOrDefault().ID, "711", 1, double.Parse(ThTien), "Exception");
                                     people.LastOrDefault().TKNo = "711";
-                                    people.LastOrDefault().TKCo = 3311;
+                                    people.LastOrDefault().TKCo = "3311";
                                     people.LastOrDefault().TkThue = 1331;
                                     people.LastOrDefault().Noidung = "Cấn trừ";
                                     people.LastOrDefault().fileImportDetails.Add(fileImportDetail);
@@ -737,14 +767,14 @@ where TenVattu = ? AND DonVi = ? ";
                                 {
                                     item.Noidung= row["Type"].ToString();
                                     item.TKNo = row["TKNo"].ToString();
-                                    item.TKCo = int.Parse(row["TKCo"].ToString());
+                                    item.TKCo = row["TKCo"].ToString();
                                     item.TkThue = int.Parse(row["TKThue"].ToString());
                                 }
                             }
                         }
                         else
                         {
-                            item.TKCo = 1111;
+                            item.TKCo = "1111";
                             item.TkThue = 1331;
                         }
                     }
@@ -836,7 +866,7 @@ where TenVattu = ? AND DonVi = ? ";
                     string ten2 = "";
                     string mst2 = "";
                     string SoHD = "";
-                    string diachi = "";
+                    string diachi = ""; 
                     int TkCo = 0;
                     int TkNo = 0;
                     int TkThue = 0;
@@ -847,13 +877,16 @@ where TenVattu = ? AND DonVi = ? ";
                     int total = rowCount + 7;
                     for (int i = 7; i < (total - 1); i++)
                     {
+                        diengiai = "";
                         mst = worksheet.Cell(i, 6).Value.ToString().Trim();
                         NLap = DateTime.Parse(worksheet.Cell(i, 5).Value.ToString().Trim());
                         ten = worksheet.Cell(i, 7).Value.ToString();
                         SHDon = worksheet.Cell(i, 4).Value.ToString().Trim();
                         KHHDon = worksheet.Cell(i, 3).Value.ToString();
                         string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?"; 
-
+                        string trangthaihoadon= worksheet.Cell(i, 16).Value.ToString();
+                        if (trangthaihoadon.Contains("điều chỉnh"))
+                            diengiai = "(*) Hóa đơn điều chỉnh";
                         // Tạo mảng tham số với giá trị cho câu lệnh SQL
                         OleDbParameter[] parameters = new OleDbParameter[]
                         {
@@ -883,6 +916,10 @@ where TenVattu = ? AND DonVi = ? ";
                         if (worksheet.Cell(i, 9).Value.ToString() != "")
                         {
                             Thanhtien = double.Parse(worksheet.Cell(i, 9).Value.ToString().Replace(",", ""));
+                            if (Thanhtien < 0)
+                            {
+                                diengiai = "(*) Hóa đơn điều chỉnh âm";
+                            }
                             TienSauVAT = double.Parse(worksheet.Cell(i, 10).Value.ToString().Replace(",", ""));
                             Vat = int.Parse(Math.Round((TienSauVAT / Thanhtien * 100)).ToString());
                         }
@@ -944,6 +981,7 @@ ORDER BY  MaSo DESC";
                                     {
                                         TkNo = int.Parse(row["MaTKNo"].ToString());  // Giả sử có cột "MaSo"; 
                                         TkCo = int.Parse(row["MaTKCo"].ToString());  // Giả sử có cột "MaSo"; 
+                                        if(string.IsNullOrEmpty(diengiai))
                                         diengiai = Helper.ConvertVniToUnicode(row["DienGiai"].ToString());
                                     }
                                     // Lấy giá trị từ cột cụ thể trong hàng hiện tại
@@ -978,7 +1016,7 @@ ORDER BY  MaSo DESC";
 
                         if (!people.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
                         {
-                            people.Add(new FileImport(excelFiles[j], SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo, TkThue, mst, Thanhtien, Vat, 2, ""));
+                            people.Add(new FileImport(excelFiles[j], SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 2, ""));
                         }
 
                     }
@@ -1063,7 +1101,7 @@ ORDER BY  MaSo DESC";
 
             dataGridView1.Columns["Ten"].Visible = true;
             dataGridView1.Columns["Ten"].HeaderText = "Tên Cty";
-            dataGridView1.Columns["Ten"].Width = (int)(dataGridView1.Width * 0.35);
+            dataGridView1.Columns["Ten"].Width = (int)(dataGridView1.Width * 0.34);
             dataGridView1.Columns["Ten"].DisplayIndex = 3;
             dataGridView1.Columns["Ten"].ReadOnly = true;
 
@@ -1094,7 +1132,7 @@ ORDER BY  MaSo DESC";
             dataGridView1.Columns["Checked"].Visible = true;
 
             dataGridView1.Columns["Checked"].HeaderText = "Chọn";
-            dataGridView1.Columns["Checked"].Width = 100;
+            dataGridView1.Columns["Checked"].Width = 50;
             dataGridView1.Columns["Checked"].DisplayIndex = 9;
             dataGridView1.Columns["Checked"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridView1.Columns["Checked"].ReadOnly = false;
@@ -1115,7 +1153,7 @@ ORDER BY  MaSo DESC";
                 {
                     continue;
                 }
-                if(item.TKCo==0 || string.IsNullOrEmpty(item.Noidung))
+                if(string.IsNullOrEmpty(item.TKCo) || string.IsNullOrEmpty(item.TKNo) || string.IsNullOrEmpty(item.Noidung))
                 {
                     isNull = true; 
                     MessageBox.Show("thông tin ko duoc de trống");
@@ -1333,6 +1371,15 @@ ORDER BY  MaSo DESC";
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
+            if (dataGridView1.Columns[e.ColumnIndex].Name == "Noidung")
+            {
+                if (e.Value.ToString().Contains("*"))
+                {
+                    // Định dạng số
+                    e.CellStyle.ForeColor = System.Drawing.Color.DarkRed; // Tô màu đỏ cho chữ
+                    e.CellStyle.Font = new System.Drawing.Font(e.CellStyle.Font, FontStyle.Bold);
+                }
+            }
             if (dataGridView1.Columns[e.ColumnIndex].Name == "TongTien")
             {
                 if (e.Value != null)
@@ -2185,7 +2232,26 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
         }
         private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.RowIndex >= 0 && (e.ColumnIndex == 9 || e.ColumnIndex == 8) && dataGridView1[e.ColumnIndex, e.RowIndex].Value!=null)
+            {
+                string query = "SELECT * FROM HeThongTK WHERE SoHieu = ?";
+                string sohieu = dataGridView1[e.ColumnIndex, e.RowIndex].Value.ToString();
 
+                if (!string.IsNullOrEmpty(sohieu))
+                {
+                    // Tạo mảng tham số với giá trị cho câu lệnh SQL
+                    OleDbParameter[] parameters = new OleDbParameter[]
+                    {
+            new OleDbParameter("?", sohieu),
+                    };
+                    var kq = ExecuteQuery(query, parameters);
+                    if (kq.Rows.Count == 0)
+                    {
+                        dataGridView1[e.ColumnIndex, e.RowIndex].Value = "";
+                        MessageBox.Show("Số tài khoản không tồn tại trong hệ thống");
+                    }
+                }
+            }
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -2423,19 +2489,23 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 // Lấy chỉ số hàng hiện tại
                 int currentRowIndex = dataGridView1.CurrentCell.RowIndex;
                 int currentColumnIndex = dataGridView1.CurrentCell.ColumnIndex;
-                if (currentColumnIndex != 9)
+                if (currentColumnIndex != 9 && currentRowIndex>0)
                 {
                     string cellValue = dataGridView1[currentColumnIndex, currentRowIndex - 1].Value?.ToString();
                     dataGridView1.Rows[currentRowIndex].Cells[currentColumnIndex].Value = cellValue;
                 }
                 else
                 {
-                    string cellValue = dataGridView1[currentColumnIndex, currentRowIndex - 1].Value?.ToString();
-                    dataGridView1.Rows[currentRowIndex].Cells[currentColumnIndex].Value = cellValue;
-                    cellValue = dataGridView1[(currentColumnIndex - 1), currentRowIndex - 1].Value?.ToString();
-                    dataGridView1.Rows[currentRowIndex].Cells[currentColumnIndex-1].Value = cellValue;
-                    cellValue = dataGridView1[(currentColumnIndex - 2), currentRowIndex - 1].Value?.ToString();
-                    dataGridView1.Rows[currentRowIndex].Cells[currentColumnIndex - 2].Value = cellValue;
+                    if(currentRowIndex>0 && dataGridView1[currentColumnIndex, currentRowIndex - 1].Value != null)
+                    {
+                        string cellValue = dataGridView1[currentColumnIndex, currentRowIndex - 1].Value?.ToString();
+                        dataGridView1.Rows[currentRowIndex].Cells[currentColumnIndex].Value = cellValue;
+                        cellValue = dataGridView1[(currentColumnIndex - 1), currentRowIndex - 1].Value?.ToString();
+                        dataGridView1.Rows[currentRowIndex].Cells[currentColumnIndex - 1].Value = cellValue;
+                        cellValue = dataGridView1[(currentColumnIndex - 2), currentRowIndex - 1].Value?.ToString();
+                        dataGridView1.Rows[currentRowIndex].Cells[currentColumnIndex - 2].Value = cellValue;
+                    }
+                   
                 }
                
             }

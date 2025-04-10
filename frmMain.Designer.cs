@@ -51,6 +51,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnLoadDbPath = new System.Windows.Forms.Button();
+            this.label11 = new System.Windows.Forms.Label();
+            this.txtPathDB = new System.Windows.Forms.TextBox();
             this.btnKHCapnhat = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.txtKHPassword = new System.Windows.Forms.TextBox();
@@ -70,9 +73,6 @@
             this.txtNoidung = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.grvDinhdanh = new System.Windows.Forms.DataGridView();
-            this.txtPathDB = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.btnLoadDbPath = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -146,7 +146,7 @@
             this.btnImport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnImport.Image = ((System.Drawing.Image)(resources.GetObject("btnImport.Image")));
             this.btnImport.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnImport.Location = new System.Drawing.Point(1075, 163);
+            this.btnImport.Location = new System.Drawing.Point(1073, 163);
             this.btnImport.Name = "btnImport";
             this.btnImport.Size = new System.Drawing.Size(198, 38);
             this.btnImport.TabIndex = 8;
@@ -162,7 +162,7 @@
             this.btnLoc.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLoc.Image = ((System.Drawing.Image)(resources.GetObject("btnLoc.Image")));
             this.btnLoc.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLoc.Location = new System.Drawing.Point(1075, 104);
+            this.btnLoc.Location = new System.Drawing.Point(1073, 104);
             this.btnLoc.Name = "btnLoc";
             this.btnLoc.Size = new System.Drawing.Size(198, 40);
             this.btnLoc.TabIndex = 7;
@@ -179,7 +179,7 @@
             this.cbbTo.FormattingEnabled = true;
             this.cbbTo.Location = new System.Drawing.Point(709, 112);
             this.cbbTo.Name = "cbbTo";
-            this.cbbTo.Size = new System.Drawing.Size(345, 28);
+            this.cbbTo.Size = new System.Drawing.Size(343, 28);
             this.cbbTo.TabIndex = 6;
             // 
             // label3
@@ -224,7 +224,7 @@
             this.btnCapnhat.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCapnhat.Image = ((System.Drawing.Image)(resources.GetObject("btnCapnhat.Image")));
             this.btnCapnhat.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCapnhat.Location = new System.Drawing.Point(1075, 44);
+            this.btnCapnhat.Location = new System.Drawing.Point(1073, 44);
             this.btnCapnhat.Name = "btnCapnhat";
             this.btnCapnhat.Size = new System.Drawing.Size(198, 34);
             this.btnCapnhat.TabIndex = 2;
@@ -238,12 +238,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPath.Location = new System.Drawing.Point(152, 49);
             this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(902, 26);
+            this.txtPath.Size = new System.Drawing.Size(900, 26);
             this.txtPath.TabIndex = 1;
             // 
             // dataGridView1
             // 
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("VNI-Times", 7.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Times New Roman", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -256,7 +256,7 @@
             this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("VK Sans Display DemiBold", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(1680, 330);
+            this.dataGridView1.Size = new System.Drawing.Size(1678, 328);
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
@@ -278,7 +278,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1720, 670);
+            this.tabControl1.Size = new System.Drawing.Size(1718, 668);
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             this.tabControl1.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabControl1_Selected);
@@ -292,7 +292,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 29);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1712, 637);
+            this.tabPage1.Size = new System.Drawing.Size(1710, 635);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Import Data";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -320,7 +320,7 @@
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(20, 17);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1290, 212);
+            this.groupBox2.Size = new System.Drawing.Size(1288, 212);
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Lọc dữ liệu";
@@ -332,7 +332,7 @@
             this.groupBox1.Controls.Add(this.btnDownloadFromCQT);
             this.groupBox1.Controls.Add(this.btnLoadFromDisk);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(1326, 21);
+            this.groupBox1.Location = new System.Drawing.Point(1324, 21);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(374, 208);
             this.groupBox1.TabIndex = 4;
@@ -367,6 +367,37 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(525, 625);
             this.panel2.TabIndex = 0;
+            // 
+            // btnLoadDbPath
+            // 
+            this.btnLoadDbPath.BackColor = System.Drawing.Color.DimGray;
+            this.btnLoadDbPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLoadDbPath.ForeColor = System.Drawing.Color.White;
+            this.btnLoadDbPath.Location = new System.Drawing.Point(423, 233);
+            this.btnLoadDbPath.Name = "btnLoadDbPath";
+            this.btnLoadDbPath.Size = new System.Drawing.Size(78, 35);
+            this.btnLoadDbPath.TabIndex = 7;
+            this.btnLoadDbPath.Text = "Chọn";
+            this.btnLoadDbPath.UseVisualStyleBackColor = false;
+            this.btnLoadDbPath.Click += new System.EventHandler(this.btnLoadDbPath_Click);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.ForeColor = System.Drawing.Color.White;
+            this.label11.Location = new System.Drawing.Point(23, 241);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(66, 20);
+            this.label11.TabIndex = 6;
+            this.label11.Text = "Db path";
+            // 
+            // txtPathDB
+            // 
+            this.txtPathDB.Location = new System.Drawing.Point(107, 239);
+            this.txtPathDB.Name = "txtPathDB";
+            this.txtPathDB.Size = new System.Drawing.Size(309, 26);
+            this.txtPathDB.TabIndex = 5;
+            this.txtPathDB.TextChanged += new System.EventHandler(this.txtPathDB_TextChanged);
             // 
             // btnKHCapnhat
             // 
@@ -554,43 +585,12 @@
             this.grvDinhdanh.TabIndex = 0;
             this.grvDinhdanh.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.grvDinhdanh_CellContentClick);
             // 
-            // txtPathDB
-            // 
-            this.txtPathDB.Location = new System.Drawing.Point(107, 239);
-            this.txtPathDB.Name = "txtPathDB";
-            this.txtPathDB.Size = new System.Drawing.Size(309, 26);
-            this.txtPathDB.TabIndex = 5;
-            this.txtPathDB.TextChanged += new System.EventHandler(this.txtPathDB_TextChanged);
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.ForeColor = System.Drawing.Color.White;
-            this.label11.Location = new System.Drawing.Point(23, 241);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(66, 20);
-            this.label11.TabIndex = 6;
-            this.label11.Text = "Db path";
-            // 
-            // btnLoadDbPath
-            // 
-            this.btnLoadDbPath.BackColor = System.Drawing.Color.DimGray;
-            this.btnLoadDbPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLoadDbPath.ForeColor = System.Drawing.Color.White;
-            this.btnLoadDbPath.Location = new System.Drawing.Point(423, 233);
-            this.btnLoadDbPath.Name = "btnLoadDbPath";
-            this.btnLoadDbPath.Size = new System.Drawing.Size(78, 35);
-            this.btnLoadDbPath.TabIndex = 7;
-            this.btnLoadDbPath.Text = "Chọn";
-            this.btnLoadDbPath.UseVisualStyleBackColor = false;
-            this.btnLoadDbPath.Click += new System.EventHandler(this.btnLoadDbPath_Click);
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(1744, 694);
+            this.ClientSize = new System.Drawing.Size(1742, 692);
             this.Controls.Add(this.tabControl1);
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
