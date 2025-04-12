@@ -137,7 +137,7 @@ namespace SaovietWF
             if (string.IsNullOrEmpty(filePath))
                 return;
             // Đọc toàn bộ nội dung tệp
-            string password = "1@35^7*9)";
+            string password = "1@35^7*9)1";
             connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
             //connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
             // connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database";
@@ -189,6 +189,32 @@ namespace SaovietWF
                 Console.WriteLine($"Có lỗi xảy ra: {ex.Message}");
             }
 
+        }
+        private static int GetColumnLength(OleDbConnection connection, string tableName, string columnName)
+        {
+            int length = 0;
+
+            string sql = $"SELECT TOP 1 [{columnName}] FROM [{tableName}]";
+            using (OleDbCommand command = new OleDbCommand(sql, connection))
+            {
+                using (OleDbDataReader reader = command.ExecuteReader(CommandBehavior.SchemaOnly))
+                {
+                    DataTable schemaTable = reader.GetSchemaTable();
+                    if (schemaTable != null)
+                    {
+                        foreach (DataRow row in schemaTable.Rows)
+                        {
+                            if (row["ColumnName"].ToString() == columnName)
+                            {
+                                length = Convert.ToInt32(row["ColumnSize"]);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return length;
         }
         static bool TableExists(OleDbConnection connection, string tableName)
         {
@@ -274,9 +300,51 @@ namespace SaovietWF
         public frmMain()
         {
             InitializeComponent();
-            InitData();
-            InitDB();
+            try
+            {
+                InitData();
+                InitDB();
 
+                CheckDB();
+            }
+            catch(Exception ex)
+            {
+
+            }
+          
+        }
+        private void CheckDB()
+        {
+            OleDbConnection connection = new OleDbConnection(connectionString);
+            connection.Open();
+            int checkLenghtTen = GetColumnLength(connection, "KhachHang", "Ten");
+            if(checkLenghtTen<255)
+            {
+                // Lệnh SQL để thay đổi kích thước cột Ten từ 100 sang 255
+                string sql = "ALTER TABLE KhachHang ALTER COLUMN Ten TEXT(255)";
+
+                using (OleDbCommand command = new OleDbCommand(sql, connection))
+                {
+                    // Thực thi lệnh SQL
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Kích thước cột Ten đã được thay đổi thành 255.");
+
+                }
+            }
+            int checkLenghtDiachi = GetColumnLength(connection, "KhachHang", "DiaChi");
+            if (checkLenghtDiachi < 255)
+            {
+                // Lệnh SQL để thay đổi kích thước cột Ten từ 100 sang 255
+                string sql = "ALTER TABLE KhachHang ALTER COLUMN DiaChi TEXT(255)";
+
+                using (OleDbCommand command = new OleDbCommand(sql, connection))
+                {
+                    // Thực thi lệnh SQL
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Kích thước cột Ten đã được thay đổi thành 255.");
+
+                }
+            }
         }
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -326,15 +394,22 @@ namespace SaovietWF
                 }
             }
         }
+
         private void frmMain_Load(object sender, EventArgs e)
         {
+            //string test = GenerateResultString("Bộ lau nhà xoay 360 độ Sunhouse KS-CL300IB");
+            string ddd = NormalizeVietnameseString("Bộ lau nhà xoay 360 độ Sunhouse KS-CL300IB");
+            string test = GenerateResultString(ddd);
+            string test2= GenerateResultString("Bộ lau nhà");
+
+           
             //string querykh = @" SELECT *  FROM License "; // Sử dụng ? thay cho @mst trong OleDb
 
             //result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
 
             //Kiểm tra có thiết lập đường dẫn chưa
             CheckPathExist();
-            LoadXmlFiles(savedPath);
+            //LoadXmlFiles(savedPath);
         }
         private void cbbFrom_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -359,9 +434,51 @@ namespace SaovietWF
 
             return false; // Không phải thư mục tháng hợp lệ
         }
+        public static string NormalizeVietnameseString(string input)
+        {
+
+            input = input.Normalize(NormalizationForm.FormC);
+
+            if (string.IsNullOrEmpty(input))
+                return input;
+            return input;
+
+            // Bước 1: Chuẩn hóa dấu huyền/sắc/hỏi/ngã/nặng tách rời
+            var replacements = new Dictionary<string, string>
+    {
+        // Dấu huyền (`) tách rời (U+0300)
+        {"à", "à"}, {"ằ", "ằ"}, {"ầ", "ầ"}, {"è", "è"}, {"ề", "ề"},
+        {"ì", "ì"}, {"ò", "ò"}, {"ồ", "ồ"}, {"ờ", "ờ"}, {"ù", "ù"}, {"ừ", "ừ"}, {"ỳ", "ỳ"},
+        
+        // Dấu sắc (') tách rời (U+0301)
+        {"á", "á"}, {"ắ", "ắ"}, {"ấ", "ấ"}, {"é", "é"}, {"ế", "ế"},
+        {"í", "í"}, {"ó", "ó"}, {"ố", "ố"}, {"ớ", "ớ"}, {"ú", "ú"}, {"ứ", "ứ"}, {"ý", "ý"},
+        
+        // Dấu hỏi (?) tách rời (U+0309)
+        {"ả", "ả"}, {"ẳ", "ẳ"}, {"ẩ", "ẩ"}, {"ẻ", "ẻ"}, {"ể", "ể"},
+        {"ỉ", "ỉ"}, {"ỏ", "ỏ"}, {"ổ", "ổ"}, {"ở", "ở"}, {"ủ", "ủ"}, {"ử", "ử"}, {"ỷ", "ỷ"},
+        
+        // Dấu ngã (~) tách rời (U+0303)
+        {"ã", "ã"}, {"ẵ", "ẵ"}, {"ẫ", "ẫ"}, {"ẽ", "ẽ"}, {"ễ", "ễ"},
+        {"ĩ", "ĩ"}, {"õ", "õ"}, {"ỗ", "ỗ"}, {"ỡ", "ỡ"}, {"ũ", "ũ"}, {"ữ", "ữ"}, {"ỹ", "ỹ"},
+        
+        // Dấu nặng (.) tách rời (U+0323)
+        {"ạ", "ạ"}, {"ặ", "ặ"}, {"ậ", "ậ"}, {"ẹ", "ẹ"}, {"ệ", "ệ"},
+        {"ị", "ị"}, {"ọ", "ọ"}, {"ộ", "ộ"}, {"ợ", "ợ"}, {"ụ", "ụ"}, {"ự", "ự"}, {"ỵ", "ỵ"}
+    };
+
+            // Bước 2: Thay thế tất cả các trường hợp
+            foreach (var replacement in replacements)
+            {
+                input = input.Replace(replacement.Key, replacement.Value);
+            }
+
+            return input;
+        }
         private void LoadXmlFiles(string path)
         {
-            
+            frmLoading frmLoad = new frmLoading();
+            frmLoad.ShowDialog();
             if (string.IsNullOrEmpty(savedPath))
                 return;
             people = new BindingList<FileImport>();
@@ -384,7 +501,18 @@ namespace SaovietWF
                 //Đọc từ XML
                 XmlDocument xmlDoc = new XmlDocument();
                 string fullPath = file;
-                xmlDoc.Load(fullPath); // Tải file XML
+                using (StreamReader reader = new StreamReader(fullPath, Encoding.UTF8))
+                {
+                    try
+                    {
+                        xmlDoc.Load(reader); // Tải file XML
+                    }
+                    catch (XmlException ex)
+                    {
+                        Console.WriteLine($"Lỗi khi tải file XML: {ex.Message}");
+                        return;
+                    }
+                }
 
                 // Lấy phần tử gốc
                 XmlNode root = xmlDoc.DocumentElement;
@@ -639,7 +767,9 @@ where TenVattu = ? AND DonVi = ? ";
 
                             string sohieu = ""; 
                             if (getdata.Rows.Count == 0)
-                                sohieu = GenerateResultString(THHDVu.Trim());
+                            {
+                                sohieu = GenerateResultString(NormalizeVietnameseString(THHDVu.Trim()));
+                            }
                             else
                                 sohieu = getdata.Rows[0]["SoHieu"].ToString();
 
@@ -921,7 +1051,10 @@ where TenVattu = ? AND DonVi = ? ";
                                 diengiai = "(*) Hóa đơn điều chỉnh âm";
                             }
                             TienSauVAT = double.Parse(worksheet.Cell(i, 10).Value.ToString().Replace(",", ""));
-                            Vat = int.Parse(Math.Round((TienSauVAT / Thanhtien * 100)).ToString());
+                            if (TienSauVAT > 0)
+                                Vat = int.Parse(Math.Round((TienSauVAT / Thanhtien * 100)).ToString());
+                            else
+                                Vat = 0;
                         }
                         else
                         {
@@ -1437,7 +1570,7 @@ ORDER BY  MaSo DESC";
                     "--disable-extensions",
                     "--disable-infobars");
                 //
-                string downloadPath = @"C:\S.T.E 25\S.T.E 25\Hoadon\HDDauVao";
+                string downloadPath = savedPath+"\\HDDauVao";
                 options.AddUserProfilePreference("download.default_directory", downloadPath);
                 options.AddUserProfilePreference("download.prompt_for_download", false);
                 options.AddUserProfilePreference("disable-popup-blocking", "true");
@@ -1531,7 +1664,7 @@ ORDER BY  MaSo DESC";
 
             button = wait.Until(d =>
                 d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[18]")));
-
+                
 
             ((IJavaScriptExecutor)Driver).ExecuteScript("arguments[0].scrollIntoView({behavior: 'smooth'});", button);
 
@@ -2418,6 +2551,12 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             {
                 LoadDataDinhDanh();
             }
+            if (selectedIndex == 3)
+            {
+                string query = "SELECT * FROM tbimport WHERE Status = 2";
+                var kq = ExecuteQuery(query,null);
+                dgvImportError.DataSource = kq;
+            }
         }
 
         private void btnThem_Click(object sender, EventArgs e)
@@ -2541,40 +2680,32 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
         }
 
-        private static string RemoveVietnameseDiacritics(string text)
+        private static string RemoveVietnameseDiacritics(string str)
         {
             // Mảng chứa ký tự có dấu
-            string[] arr1 = new string[]
-            {
-        "á", "à", "ả", "ã", "ạ", "â", "ấ", "ầ", "ẩ", "ẫ", "ậ", "ă", "ắ", "ằ", "ẳ", "ẵ", "ặ",
-        "đ",
-        "é", "è", "ẻ", "ẽ", "ẹ", "ê", "ế", "ề", "ể", "ễ", "ệ",
-        "í", "ì", "ỉ", "ĩ", "ị",
-        "ó", "ò", "ỏ", "õ", "ọ", "ô", "ố", "ồ", "ổ", "ỗ", "ộ", "ơ", "ớ", "ờ", "ở", "ỡ", "ợ",
-        "ú", "ù", "ủ", "ũ", "ụ", "ư", "ứ", "ừ", "ử", "ữ", "ự",
-        "ý", "ỳ", "ỷ", "ỹ", "ỵ"
-            };
+            str = str.ToLower();
+            str = Regex.Replace(str, "[àáạảãâầấậẩẫăằắặẳẵ]", "a");
+            str = Regex.Replace(str, "[èéẹẻẽêềếệểễ]", "e");
+            str = Regex.Replace(str, "[ìíịỉĩ]", "i");
+            str = Regex.Replace(str, "[òóọỏõôồốộổỗơờớợởỡ]", "o");
+            str = Regex.Replace(str, "[ùúụủũưừứựửữ]", "u");
+            str = Regex.Replace(str, "[ỳýỵỷỹ]", "y");
+            str = Regex.Replace(str, "đ", "d");
 
-            // Mảng chứa ký tự không có dấu
-            string[] arr2 = new string[]
-            {
-        "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a",
-        "d",
-        "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e",
-        "i", "i", "i", "i", "i",
-        "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o",
-        "u", "u", "u", "u", "u", "u", "u", "u", "u", "u", "u",
-        "y", "y", "y", "y", "y"
-            };
+            // Thay thế khoảng trắng bằng dấu gạch ngang
+            str = Regex.Replace(str, " ", "-");
+            str = str.Replace(",", "");
+            str = str.Replace(".", "");
 
-            // Thay thế ký tự có dấu bằng ký tự không có dấu
-            for (int i = 0; i < arr1.Length; i++)
-            {
-                text = text.Replace(arr1[i], arr2[i]); // Thay thế chữ thường
-                text = text.Replace(arr1[i].ToUpper(), arr2[i].ToUpper()); // Thay thế chữ hoa
-            }
-            var returnvalue = text.Replace("Má", "Ma").Replace("má", "ma");
-            return returnvalue;
+            // Thay thế tất cả các âm "o" có dấu thành "o" không dấu
+            str = str.Replace("ó", "o");
+            str = str.Replace("ò", "o");
+            str = str.Replace("õ", "o");
+            str = str.Replace("ọ", "o");
+            str = str.Replace("ỏ", "o");
+            str = str.Replace("ô", "o");
+            str = str.Replace("ơ", "o");
+            return str;
         }
         private static string GenerateRandomNumbers(int length)
         {
